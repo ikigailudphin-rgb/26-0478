@@ -56,76 +56,93 @@
             color:white;
             border:none;
             cursor:pointer;
-            font-size: 16px;
         }
 
         button:hover{
             background:#0066cc;
         }
 
-        /* POPUP MODAL STYLES */
-        .modal-overlay {
+        /* --- WELCOME POPUP STYLES --- */
+        .welcome-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.6); /* Dim background */
             display: flex;
             justify-content: center;
             align-items: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
+            transition: opacity 0.4s ease;
+            z-index: 9999; /* Keeps it above everything */
         }
 
-        .modal-box {
-            background: white;
-            padding: 30px;
-            border-radius: 8px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            max-width: 400px;
-            width: 90%;
-            transform: scale(0.7);
-            transition: transform 0.3s ease;
-        }
-
-        /* Class to show the modal via JS */
-        .modal-overlay.active {
+        /* Active class to make popup visible */
+        .welcome-overlay.show {
             opacity: 1;
             pointer-events: auto;
         }
-        .modal-overlay.active .modal-box {
-            transform: scale(1);
+
+        .welcome-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+            max-width: 420px;
+            width: 90%;
+            transform: translateY(-20px);
+            transition: transform 0.4s ease;
         }
 
-        .modal-box h3 {
-            color: #28a745;
+        .welcome-overlay.show .welcome-box {
+            transform: translateY(0);
+        }
+
+        .welcome-box h3 {
+            color: #003366;
             margin-top: 0;
+            font-size: 24px;
         }
 
-        .modal-close-btn {
-            background: #28a745;
+        .welcome-box p {
+            color: #555;
+            font-size: 15px;
+            line-height: 1.5;
+        }
+
+        .close-welcome-btn {
+            background: #003366;
             color: white;
             border: none;
-            padding: 8px 20px;
+            padding: 10px 25px;
             border-radius: 5px;
             cursor: pointer;
+            font-weight: bold;
             margin-top: 15px;
+            transition: background 0.2s;
         }
-        .modal-close-btn:hover {
-            background: #218838;
+
+        .close-welcome-btn:hover {
+            background: #0066cc;
         }
 
     </style>
 
     <script>
-        function validateForm(event){
-            // Prevent form from auto-submitting immediately to showcase the popup
-            event.preventDefault(); 
+        // 1. POPUP ON LOAD: Runs as soon as the page elements are ready
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("welcomePopup").classList.add("show");
+        });
 
+        function closeWelcomePopup() {
+            document.getElementById("welcomePopup").classList.remove("show");
+        }
+
+        // 2. FORM VALIDATION (Your existing code)
+        function validateForm(){
             let name = document.getElementById("fullname").value;
             let email = document.getElementById("email").value;
             let phone = document.getElementById("phone").value;
@@ -136,44 +153,35 @@
                 alert("Enter your name");
                 return false;
             }
-
             if(email.indexOf("@")==-1 || email.indexOf(".")==-1){
                 alert("Invalid Email");
                 return false;
             }
-
             if(phone.length<10){
                 alert("Invalid Phone Number");
                 return false;
             }
-
             if(gender==""){
                 alert("Select Gender");
                 return false;
             }
-
             if(password.length<6){
                 alert("Password must be at least 6 characters");
                 return false;
             }
-
-            // If everything passes, show the success popup
-            showPopup();
             return true;
-        }
-
-        function showPopup() {
-            document.getElementById("successModal").classList.add("active");
-        }
-
-        function closePopup() {
-            document.getElementById("successModal").classList.remove("active");
-            // Submit the form programmatically after closing the popup, or redirect
-            document.getElementById("regForm").submit(); 
         }
     </script>
 </head>
 <body>
+
+<div class="welcome-overlay" id="welcomePopup">
+    <div class="welcome-box">
+        <h3>Welcome to Our Platform!</h3>
+        <p>Please register an account to unlock full access to our premium services, gallery, and community features.</p>
+        <button class="close-welcome-btn" onclick="closeWelcomePopup()">Get Started</button>
+    </div>
+</div>
 
 <nav>
     <a href="index.html">Home</a>
@@ -185,42 +193,29 @@
 </nav>
 
 <div class="container">
+    <h2>User Registration</h2>
+    <form action="register.php" method="POST" onsubmit="return validateForm()">
+        <label>Full Name</label>
+        <input type="text" name="fullname" id="fullname">
 
-<h2>User Registration</h2>
+        <label>Email</label>
+        <input type="text" name="email" id="email">
 
-<form id="regForm" action="register.php" method="POST" onsubmit="validateForm(event)">
+        <label>Phone Number</label>
+        <input type="text" name="phone" id="phone">
 
-<label>Full Name</label>
-<input type="text" name="fullname" id="fullname">
+        <label>Gender</label>
+        <select name="gender" id="gender">
+            <option value="">Select Gender</option>
+            <option>Male</option>
+            <option>Female</option>
+        </select>
 
-<label>Email</label>
-<input type="text" name="email" id="email">
+        <label>Password</label>
+        <input type="password" name="password" id="password">
 
-<label>Phone Number</label>
-<input type="text" name="phone" id="phone">
-
-<label>Gender</label>
-<select name="gender" id="gender">
-    <option value="">Select Gender</option>
-    <option>Male</option>
-    <option>Female</option>
-</select>
-
-<label>Password</label>
-<input type="password" name="password" id="password">
-
-<button type="submit">Register</button>
-
-</form>
-
-</div>
-
-<div class="modal-overlay" id="successModal">
-    <div class="modal-box">
-        <h3>Registration Successful!</h3>
-        <p>Thank you for signing up. Your account has been created.</p>
-        <button class="modal-close-btn" onclick="closePopup()">Proceed</button>
-    </div>
+        <button type="submit">Register</button>
+    </form>
 </div>
 
 </body>
